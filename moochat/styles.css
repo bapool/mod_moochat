@@ -51,19 +51,43 @@
     min-width: 0;
 }
 
-.moochat-interface {
-    background: #f9f9f9;
-    border-radius: 8px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    max-height: 500px;
-    height: 500px;
-    display: flex;
-    flex-direction: column;
+/* Chat sizes - Small */
+.moochat-interface.moochat-size-small {
+    max-height: 400px;
+    height: 400px;
 }
 
+.moochat-interface.moochat-size-small .moochat-messages {
+    height: 250px;
+    max-height: 250px;
+}
+
+/* Chat sizes - Medium (default) */
+.moochat-interface,
+.moochat-interface.moochat-size-medium {
+    max-height: 500px;
+    height: 500px;
+}
+
+.moochat-interface .moochat-messages,
+.moochat-interface.moochat-size-medium .moochat-messages {
+    height: 350px;
+    max-height: 350px;
+}
+
+/* Chat sizes - Large */
+.moochat-interface.moochat-size-large {
+    max-height: 700px;
+    height: 700px;
+}
+
+.moochat-interface.moochat-size-large .moochat-messages {
+    height: 550px;
+    max-height: 550px;
+}
+
+/* Base moochat-messages and moochat-interface styles */
 .moochat-messages {
-    height: 400px;
     overflow-y: auto;
     background: white;
     border: 1px solid #ddd;
@@ -71,6 +95,15 @@
     padding: 15px;
     margin-bottom: 15px;
     flex: 1;
+}
+
+.moochat-interface {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
 }
 
 .moochat-message {
@@ -81,6 +114,25 @@
     word-wrap: break-word;
     line-height: 1.5;
     font-size: 14px;
+}
+
+/* Formatting inside messages */
+.moochat-message p {
+    margin: 0 0 10px 0;
+}
+
+.moochat-message p:last-child {
+    margin-bottom: 0;
+}
+
+.moochat-message br {
+    display: block;
+    content: "";
+    margin: 5px 0;
+}
+
+.moochat-message strong {
+    font-weight: bold;
 }
 
 .moochat-user {

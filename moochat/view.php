@@ -87,7 +87,8 @@ echo '</div>'; // End sidebar
 
 // Right side - Chat interface
 echo '<div class="moochat-chat-area">';
-echo '<div class="moochat-interface" id="moochat-' . $moochat->id . '">';
+$sizeclass = 'moochat-size-' . $moochat->chatsize;
+echo '<div class="moochat-interface ' . $sizeclass . '" id="moochat-' . $moochat->id . '">';
 
 // Chat messages area
 echo '<div class="moochat-messages" id="moochat-messages-' . $moochat->id . '">';

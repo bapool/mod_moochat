@@ -38,11 +38,34 @@ class mod_moochat_mod_form extends moodleform_mod {
             0 => get_string('display_page', 'moochat'),
             1 => get_string('display_inline', 'moochat'),
         );
+
         $mform->addElement('select', 'display', get_string('display', 'moochat'), $displayoptions);
         $mform->addHelpButton('display', 'display', 'moochat');
         $mform->setDefault('display', 0);
 
+        // Chat size
+        $sizeoptions = array(
+            'small' => get_string('chatsize_small', 'moochat'),
+            'medium' => get_string('chatsize_medium', 'moochat'),
+            'large' => get_string('chatsize_large', 'moochat'),
+        );
+        $mform->addElement('select', 'chatsize', get_string('chatsize', 'moochat'), $sizeoptions);
+        $mform->addHelpButton('chatsize', 'chatsize', 'moochat');
+        $mform->setDefault('chatsize', 'medium');
 
+        
+	// Include section content
+        $mform->addElement('advcheckbox', 'include_section_content', 
+                          get_string('include_section_content', 'moochat'));
+        $mform->addHelpButton('include_section_content', 'include_section_content', 'moochat');
+        $mform->setDefault('include_section_content', 0);
+
+        // Include hidden content (only shows if section content is enabled)
+        $mform->addElement('advcheckbox', 'include_hidden_content', 
+                          get_string('include_hidden_content', 'moochat'));
+        $mform->addHelpButton('include_hidden_content', 'include_hidden_content', 'moochat');
+        $mform->setDefault('include_hidden_content', 0);
+        $mform->hideIf('include_hidden_content', 'include_section_content');
         // Avatar Image Upload
         $mform->addElement('filemanager', 'avatar', 
                           get_string('avatar', 'moochat'),

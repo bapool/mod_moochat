@@ -25,6 +25,15 @@ $string['display_help'] = 'Choose how the chat interface is displayed:<br>
 <strong>Inline on course page:</strong> The chat interface appears directly on the course page.';
 $string['display_page'] = 'Separate page';
 $string['display_inline'] = 'Inline on course page';
+$string['chatsize'] = 'Chat Interface Size';
+$string['chatsize_help'] = 'Choose the size of the chat interface. Larger sizes provide more space for conversations and are recommended for separate page display mode.';
+$string['chatsize_small'] = 'Small (300px messages, 400px total)';
+$string['chatsize_medium'] = 'Medium (400px messages, 500px total)';
+$string['chatsize_large'] = 'Large (600px messages, 700px total)';
+$string['include_section_content'] = 'Include Section Content';
+$string['include_section_content_help'] = 'When enabled, the AI will have access to all content in the current course section, including pages, books, labels, assignments, URLs, and glossary entries. This allows the chatbot to answer questions about course materials in context.';
+$string['include_hidden_content'] = 'Include Hidden Content';
+$string['include_hidden_content_help'] = 'When enabled, hidden activities and resources will be included in the section content provided to the AI. This allows the chatbot to answer questions about upcoming or draft content. Note: Students will still see responses based on hidden content if this is enabled.';
 $string['avatar'] = 'Avatar Image';
 $string['avatar_help'] = 'Upload an image to represent your chatbot (e.g., historical figure, mascot, etc.). Recommended size: 128x128 pixels.';
 $string['avatarsize'] = 'Avatar Size';

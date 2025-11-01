@@ -149,8 +149,8 @@ function moochat_get_coursemodule_info($coursemodule) {
         
         // Right side - Chat interface
         $content .= '<div class="moochat-chat-area">';
-        $content .= '<div class="moochat-interface" id="moochat-' . $moochat->id . '">';
-        
+        $sizeclass = 'moochat-size-' . $moochat->chatsize;
+$content .= '<div class="moochat-interface ' . $sizeclass . '" id="moochat-' . $moochat->id . '">';        
         // Chat messages area
         $content .= '<div class="moochat-messages" id="moochat-messages-' . $moochat->id . '">';
         $content .= '<p class="moochat-welcome">' . get_string('startchat', 'moochat') . '</p>';
@@ -191,4 +191,87 @@ function moochat_cm_info_view(cm_info $cm) {
         // Only load JS for inline display mode
         $PAGE->requires->js_call_amd('mod_moochat/chat', 'init', array($moochat->id));
     }
+}
+/**
+ * Extract content from the current section
+ */
+function moochat_get_section_content($courseid, $sectionnum, $includehidden = false) {
+    global $DB;
+    
+    $content = "\n\n=== COURSE SECTION CONTENT ===\n\n";
+    
+    // Get all course modules in this section
+    $modinfo = get_fast_modinfo($courseid);
+    $section = $modinfo->get_section_info($sectionnum);
+    
+    if (empty($section->sequence)) {
+        return '';
+    }
+    
+    $cms = explode(',', $section->sequence);
+    
+    foreach ($cms as $cmid) {
+        $cm = $modinfo->get_cm($cmid);
+        
+        // Skip if not visible (unless includehidden is true)
+        if (!$includehidden && !$cm->uservisible) {
+            continue;
+        }
+        
+        $content .= "\n--- " . format_string($cm->name) . " ---\n";
+        
+        // Extract content based on module type
+        switch ($cm->modname) {
+            case 'page':
+                if ($page = $DB->get_record('page', array('id' => $cm->instance))) {
+                    $content .= strip_tags($page->content) . "\n";
+                }
+                break;
+                
+            case 'book':
+                if ($book = $DB->get_record('book', array('id' => $cm->instance))) {
+                    $chapters = $DB->get_records('book_chapters', array('bookid' => $book->id), 'pagenum');
+                    foreach ($chapters as $chapter) {
+                        $content .= "Chapter: " . format_string($chapter->title) . "\n";
+                        $content .= strip_tags($chapter->content) . "\n";
+                    }
+                }
+                break;
+                
+            case 'label':
+                if ($label = $DB->get_record('label', array('id' => $cm->instance))) {
+                    $content .= strip_tags($label->intro) . "\n";
+                }
+                break;
+                
+            case 'assign':
+                if ($assign = $DB->get_record('assign', array('id' => $cm->instance))) {
+                    $content .= "Assignment Description: " . strip_tags($assign->intro) . "\n";
+                }
+                break;
+                
+            case 'url':
+                if ($url = $DB->get_record('url', array('id' => $cm->instance))) {
+                    $content .= "URL: " . $url->externalurl . "\n";
+                    if ($url->intro) {
+                        $content .= strip_tags($url->intro) . "\n";
+                    }
+                }
+                break;
+                
+            case 'glossary':
+                if ($glossary = $DB->get_record('glossary', array('id' => $cm->instance))) {
+                    $entries = $DB->get_records('glossary_entries', array('glossaryid' => $glossary->id));
+                    $content .= "Glossary Entries:\n";
+                    foreach ($entries as $entry) {
+                        $content .= "- " . format_string($entry->concept) . ": " . strip_tags($entry->definition) . "\n";
+                    }
+                }
+                break;
+        }
+    }
+    
+    $content .= "\n=== END COURSE SECTION CONTENT ===\n\n";
+    
+    return $content;
 }

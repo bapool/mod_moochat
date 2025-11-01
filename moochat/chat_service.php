@@ -9,6 +9,7 @@
 define('AJAX_SCRIPT', true);
 
 require_once('../../config.php');
+require_once('lib.php');
 
 $PAGE->set_context(context_system::instance());
 
@@ -94,6 +95,23 @@ if ($maxmessages > 0 && count($history) >= ($maxmessages * 2)) {
 // Build full prompt with system instructions and conversation history
 $systemprompt = !empty($moochat->systemprompt) ? $moochat->systemprompt : get_string('defaultprompt', 'moochat');
 $fullprompt = $systemprompt . "\n\n";
+
+// Add section content if enabled
+if ($moochat->include_section_content) {
+    // Get section number from section id
+    $section = $DB->get_record('course_sections', array('id' => $cm->section));
+    $sectionnum = $section ? $section->section : 0;
+    
+    $include_hidden = isset($moochat->include_hidden_content) ? $moochat->include_hidden_content : 0;
+    $sectioncontent = moochat_get_section_content($moochat->course, $sectionnum, $include_hidden);
+    
+    /*/ DEBUG - Log what we got
+    error_log("Section number: " . $sectionnum);
+    error_log("Section content length: " . strlen($sectioncontent));
+    error_log("Section content preview: " . substr($sectioncontent, 0, 500));*/
+    
+    $fullprompt .= $sectioncontent;
+}
 
 // Add conversation history
 foreach ($history as $msg) {

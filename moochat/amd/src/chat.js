@@ -125,13 +125,53 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             };
             
             // Add message to display
-            var addMessage = function(role, content) {
-                var messageClass = role === 'user' ? 'moochat-user' : 'moochat-assistant';
-                var messageHtml = '<div class="moochat-message ' + messageClass + '">' +
-                                 escapeHtml(content) + '</div>';
-                messagesDiv.append(messageHtml);
-                scrollToBottom();
-            };
+	var addMessage = function(role, content) {
+	    var messageClass = role === 'user' ? 'moochat-user' : 'moochat-assistant';
+	    var formattedContent = formatMessage(content);
+	    var messageHtml = '<div class="moochat-message ' + messageClass + '">' +
+			     formattedContent + '</div>';
+	    messagesDiv.append(messageHtml);
+	    scrollToBottom();
+	};
+
+	// Format message content with line breaks and basic formatting
+	var formatMessage = function(text) {
+	    // Escape HTML first
+	    var escaped = escapeHtml(text);
+	    
+	    // Only format if it's a longer response (more than 100 chars or has multiple sentences)
+	    var sentenceCount = (text.match(/[.!?]+/g) || []).length;
+	    
+	    if (text.length < 100 && sentenceCount <= 3) {
+		// Short response - return as-is
+		return escaped;
+	    }
+	    
+	    // Handle markdown bold (**text** or __text__)
+	    escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+	    escaped = escaped.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+	    
+	    // Handle markdown italic (*text* or _text_) - but not bullet points
+	    escaped = escaped.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+	    
+	    // Convert double line breaks to paragraphs
+	    escaped = escaped.replace(/\n\n+/g, '</p><p>');
+	    
+	    // Convert single line breaks to <br>
+	    escaped = escaped.replace(/\n/g, '<br>');
+	    
+	    // Wrap in paragraph tags
+	    escaped = '<p>' + escaped + '</p>';
+	    
+	    // Handle numbered lists (1. 2. 3.)
+	    escaped = escaped.replace(/(\d+)\.\s/g, '<br><strong>$1.</strong> ');
+	    
+	    // Handle bullet points at start of line (- or * followed by space)
+	    escaped = escaped.replace(/<br>[-*]\s+/g, '<br>• ');
+	    escaped = escaped.replace(/<p>[-*]\s+/g, '<p>• ');
+	    
+	    return escaped;
+	};
             
             // Scroll to bottom of messages
             var scrollToBottom = function() {

@@ -19,12 +19,46 @@ function xmldb_moochat_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
-    // Add future upgrade steps here
-    // Example:
-    // if ($oldversion < 2025103002) {
-    //     // Upgrade code here
-    //     upgrade_mod_savepoint(true, 2025103002, 'moochat');
-    // }
+    // Add display field
+    if ($oldversion < 2025103002) {
+        $table = new xmldb_table('moochat');
+        $field = new xmldb_field('display', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'introformat');
+        
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2025103002, 'moochat');
+    }
+
+    // Add include_section_content and include_hidden_content fields
+    if ($oldversion < 2025103003) {
+        $table = new xmldb_table('moochat');
+        
+        $field1 = new xmldb_field('include_section_content', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'display');
+        if (!$dbman->field_exists($table, $field1)) {
+            $dbman->add_field($table, $field1);
+        }
+        
+        $field2 = new xmldb_field('include_hidden_content', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'include_section_content');
+        if (!$dbman->field_exists($table, $field2)) {
+            $dbman->add_field($table, $field2);
+        }
+        
+        upgrade_mod_savepoint(true, 2025103003, 'moochat');
+    }
+
+    // Add chatsize field
+    if ($oldversion < 2025103004) {
+        $table = new xmldb_table('moochat');
+        $field = new xmldb_field('chatsize', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, 'medium', 'include_hidden_content');
+        
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_mod_savepoint(true, 2025103004, 'moochat');
+    }
 
     return true;
 }

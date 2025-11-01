@@ -9,7 +9,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_moochat';
-$plugin->version = 2025103001;
+$plugin->version = 2025103004;  // YYYYMMDDXX - Added chat size options
 $plugin->requires = 2022041900; // Moodle 4.0
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->release = 'v1.0';
+$plugin->maturity = MATURITY_BETA;
+$plugin->release = 'v1.1';
