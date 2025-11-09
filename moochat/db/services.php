@@ -16,8 +16,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_moochat';
-$plugin->version = 2025103009;  // YYYYMMDDXX - Converted to Templates and Output API
-$plugin->requires = 2022041900; // Moodle 4.0
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = 'v1.2.2';
+$functions = [
+    'mod_moochat_send_message' => [
+        'classname'   => 'mod_moochat\external\send_message',
+        'methodname'  => 'execute',
+        'description' => 'Send a chat message and receive AI response',
+        'type'        => 'write',
+        'ajax'        => true,
+        'capabilities'=> 'mod/moochat:submit',
+        'loginrequired' => true,
+    ],
+];

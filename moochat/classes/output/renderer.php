@@ -14,10 +14,22 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_moochat\output;
+
+use plugin_renderer_base;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_moochat';
-$plugin->version = 2025103009;  // YYYYMMDDXX - Converted to Templates and Output API
-$plugin->requires = 2022041900; // Moodle 4.0
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = 'v1.2.2';
+class renderer extends plugin_renderer_base {
+
+    /**
+     * Render the chat interface.
+     *
+     * @param chat_interface $chatinterface
+     * @return string HTML
+     */
+    public function render_chat_interface(chat_interface $chatinterface) {
+        $data = $chatinterface->export_for_template($this);
+        return $this->render_from_template('mod_moochat/chat_interface', $data);
+    }
+}

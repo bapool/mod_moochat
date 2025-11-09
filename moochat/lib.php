@@ -6,6 +6,14 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
+/**
+ * Define all the restore steps that will be used by the restore_moochat_activity_task
+ *
+ * @package    mod_moochat
+ * @copyright  2025 Brian A. Pool
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -129,50 +137,10 @@ function moochat_get_coursemodule_info($coursemodule) {
             );
         }
         
-        // Include JavaScript
-        //$PAGE->requires->js_call_amd('mod_moochat/chat', 'init', array($moochat->id));
-        
-        // Build inline content
-        $content = '';
-        $content .= '<div class="moochat-activity-container">';
-        
-        // Left side - Avatar and info
-        $content .= '<div class="moochat-sidebar">';
-        if ($avatarurl) {
-            $content .= '<div class="moochat-avatar-large">';
-            $content .= html_writer::img($avatarurl, $moochat->name, array('width' => $moochat->avatarsize, 'height' => $moochat->avatarsize));
-            $content .= '</div>';
-        }
-        $content .= '<h3 class="moochat-sidebar-title">' . format_string($moochat->name) . '</h3>';
-        $content .= '<div class="moochat-remaining-sidebar" id="moochat-remaining-' . $moochat->id . '"></div>';
-        $content .= '</div>'; // End sidebar
-        
-        // Right side - Chat interface
-        $content .= '<div class="moochat-chat-area">';
-        $sizeclass = 'moochat-size-' . $moochat->chatsize;
-$content .= '<div class="moochat-interface ' . $sizeclass . '" id="moochat-' . $moochat->id . '">';        
-        // Chat messages area
-        $content .= '<div class="moochat-messages" id="moochat-messages-' . $moochat->id . '">';
-        $content .= '<p class="moochat-welcome">' . get_string('startchat', 'moochat') . '</p>';
-        $content .= '</div>';
-        
-        // Input area
-        $content .= '<div class="moochat-input-area">';
-        $content .= '<textarea id="moochat-input-' . $moochat->id . '" class="moochat-input" placeholder="' . 
-                   get_string('typemessage', 'moochat') . '" rows="3"></textarea>';
-        
-        // Buttons
-        $content .= '<div class="moochat-buttons">';
-        $content .= '<button id="moochat-send-' . $moochat->id . '" class="btn btn-primary moochat-send">' . 
-                   get_string('send', 'moochat') . '</button>';
-        $content .= '<button id="moochat-clear-' . $moochat->id . '" class="btn btn-secondary moochat-clear">' . 
-                   get_string('clear', 'moochat') . '</button>';
-        $content .= '</div>'; // End buttons
-        
-        $content .= '</div>'; // End input area
-        $content .= '</div>'; // End moochat-interface
-        $content .= '</div>'; // End chat-area
-        $content .= '</div>'; // End container
+        // Render using template
+        $chatinterface = new \mod_moochat\output\chat_interface($moochat, $avatarurl);
+        $renderer = $PAGE->get_renderer('mod_moochat');
+        $content = $renderer->render_chat_interface($chatinterface);
         
         $info->content = $content;
     }

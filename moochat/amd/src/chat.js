@@ -1,6 +1,6 @@
 // This file is part of Moodle - http://moodle.org/
 
-define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notification) {
+define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Ajax, Notification, Str) {
     
     return {
         init: function(moochatid) {
@@ -8,6 +8,20 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             var conversationHistory = [];
             var messageCount = 0;
             var remainingQuestions = -1; // -1 means unlimited
+            
+            // Load language strings
+            var strings = [];
+            Str.get_strings([
+                {key: 'questionsremaining_js', component: 'mod_moochat'},
+                {key: 'thinking_js', component: 'mod_moochat'},
+                {key: 'ratelimitreached_title', component: 'mod_moochat'},
+                {key: 'error_title', component: 'mod_moochat'},
+                {key: 'connectionerror', component: 'mod_moochat'},
+                {key: 'chatcleared', component: 'mod_moochat'},
+                {key: 'confirmclear', component: 'mod_moochat'}
+            ]).done(function(s) {
+                strings = s;
+            });
             
             var messagesDiv = $('#moochat-messages-' + moochatid);
             var inputField = $('#moochat-input-' + moochatid);
@@ -18,7 +32,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             // Update remaining questions display
             var updateRemaining = function(remaining) {
                 if (remaining >= 0) {
-                    var message = 'Questions remaining: ' + remaining;
+                    var message = strings[0] + ': ' + remaining;
                     remainingDiv.html('<div class="alert alert-info">' + message + '</div>');
                     remainingDiv.show();
                 } else {
@@ -54,73 +68,69 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
                 var thinkingId = 'thinking-' + Date.now();
                 messagesDiv.append(
                     '<div class="moochat-message moochat-assistant" id="' + thinkingId + '">' +
-                    '<em>Thinking...</em></div>'
+                    '<em>' + strings[1] + '</em></div>'
                 );
                 scrollToBottom();
                 
                 // Call API
-                $.ajax({
-                    url: M.cfg.wwwroot + '/mod/moochat/chat_service.php',
-                    method: 'POST',
-                    data: {
+                // Call API using Moodle's Ajax module
+                Ajax.call([{
+                    methodname: 'mod_moochat_send_message',
+                    args: {
                         moochatid: moochatid,
                         message: message,
-                        history: JSON.stringify(conversationHistory),
-                        sesskey: M.cfg.sesskey
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        // Remove thinking indicator
-                        $('#' + thinkingId).remove();
+                        history: JSON.stringify(conversationHistory)
+                    }
+                }])[0].then(function(response) {
+                    // Remove thinking indicator
+                    $('#' + thinkingId).remove();
+                    
+                    if (response.error || !response.success) {
+                        // Check if this is a rate limit error
+                        if (response.remaining !== undefined && response.remaining === 0) {
+                            Notification.alert(strings[2], response.error, 'OK');
+                            inputField.prop('disabled', true);
+                            sendButton.prop('disabled', true);
+                            updateRemaining(0);
+                        } else {
+                            Notification.alert(strings[3], response.error, 'OK');
+                        }
+                    } else if (response.success && response.reply) {
+                        // Add assistant reply
+                        addMessage('assistant', response.reply);
                         
-                        if (response.error) {
-                            // Check if this is a rate limit error
-                            if (response.remaining !== undefined && response.remaining === 0) {
-                                Notification.alert('Rate Limit Reached', response.error, 'OK');
+                        // Add to history
+                        conversationHistory.push({
+                            role: 'assistant',
+                            content: response.reply
+                        });
+                        
+                        messageCount++;
+                        
+                        // Update remaining questions
+                        if (response.remaining !== undefined) {
+                            remainingQuestions = response.remaining;
+                            updateRemaining(remainingQuestions);
+                            
+                            // Disable if no questions left
+                            if (remainingQuestions === 0) {
                                 inputField.prop('disabled', true);
                                 sendButton.prop('disabled', true);
-                                updateRemaining(0);
-                            } else {
-                                Notification.alert('Error', response.error, 'OK');
-                            }
-                        } else if (response.success && response.reply) {
-                            // Add assistant reply
-                            addMessage('assistant', response.reply);
-                            
-                            // Add to history
-                            conversationHistory.push({
-                                role: 'assistant',
-                                content: response.reply
-                            });
-                            
-                            messageCount++;
-                            
-                            // Update remaining questions
-                            if (response.remaining !== undefined) {
-                                remainingQuestions = response.remaining;
-                                updateRemaining(remainingQuestions);
-                                
-                                // Disable if no questions left
-                                if (remainingQuestions === 0) {
-                                    inputField.prop('disabled', true);
-                                    sendButton.prop('disabled', true);
-                                }
                             }
                         }
-                        
-                        // Re-enable input (unless disabled by rate limit)
-                        if (remainingQuestions !== 0) {
-                            inputField.prop('disabled', false);
-                            sendButton.prop('disabled', false);
-                            inputField.focus();
-                        }
-                    },
-                    error: function() {
-                        $('#' + thinkingId).remove();
-                        Notification.alert('Error', 'Failed to connect to AI service', 'OK');
+                    }
+                    
+                    // Re-enable input (unless disabled by rate limit)
+                    if (remainingQuestions !== 0) {
                         inputField.prop('disabled', false);
                         sendButton.prop('disabled', false);
+                        inputField.focus();
                     }
+                }).catch(function(ex) {
+                    $('#' + thinkingId).remove();
+                    Notification.alert(strings[3], strings[4], 'OK');
+                    inputField.prop('disabled', false);
+                    sendButton.prop('disabled', false);
                 });
             };
             
@@ -189,7 +199,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             var clearChat = function() {
                 conversationHistory = [];
                 messageCount = 0;
-                messagesDiv.html('<p class="moochat-welcome">Chat cleared. Start a new conversation!</p>');
+                messagesDiv.html('<p class="moochat-welcome">' + strings[5] + '</p>');
                 inputField.val('').focus();
                 // Note: remaining questions counter stays the same
             };
@@ -205,7 +215,7 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             });
             
             clearButton.on('click', function() {
-                if (confirm('Clear all messages? (Your question limit will not reset)')) {
+                if (confirm(strings[6])) {
                     clearChat();
                 }
             });

@@ -6,6 +6,14 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
+/**
+ * Define all the restore steps that will be used by the restore_moochat_activity_task
+ *
+ * @package    mod_moochat
+ * @copyright  2025 Brian A. Pool
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once('../../config.php');
 require_once($CFG->dirroot.'/mod/moochat/lib.php');
 
@@ -16,23 +24,23 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $moochat = $DB->get_record('moochat', array('id' => $cm->instance), '*', MUST_EXIST);
 } else {
-    print_error('missingidandcmid', 'moochat');
+    throw new moodle_exception('missingidandcmid', 'moochat');
 }
 
 require_login($course, true, $cm);
 
 $context = context_module::instance($cm->id);
 require_capability('mod/moochat:view', $context);
-/*
+//
 // Trigger module viewed event
-$event = \core\event\course_module_viewed::create(array(
+$event = \mod_moochat\event\course_module_viewed::create(array(
     'objectid' => $moochat->id,
     'context' => $context,
 ));
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('moochat', $moochat);
 $event->trigger();
-*/
+//
 // Set up the page
 $PAGE->set_url('/mod/moochat/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($moochat->name));

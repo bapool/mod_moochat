@@ -6,6 +6,14 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
+/**
+ * Define all the restore steps that will be used by the restore_moochat_activity_task
+ *
+ * @package    mod_moochat
+ * @copyright  2025 Brian A. Pool
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'MooChat';
@@ -80,3 +88,11 @@ $string['privacy:metadata:moochat_usage:userid'] = 'The ID of the user';
 $string['privacy:metadata:moochat_usage:messagecount'] = 'Number of messages sent';
 $string['privacy:metadata:moochat_usage:firstmessage'] = 'Timestamp of first message';
 $string['privacy:metadata:moochat_usage:lastmessage'] = 'Timestamp of last message';
+// JavaScript strings
+$string['questionsremaining_js'] = 'Questions remaining';
+$string['thinking_js'] = 'Thinking...';
+$string['ratelimitreached_title'] = 'Rate Limit Reached';
+$string['error_title'] = 'Error';
+$string['connectionerror'] = 'Failed to connect to AI service';
+$string['chatcleared'] = 'Chat cleared. Start a new conversation!';
+$string['confirmclear'] = 'Clear all messages? (Your question limit will not reset)';
