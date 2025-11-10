@@ -7,7 +7,7 @@
 // (at your option) any later version.
 
 /**
- * Define all the restore steps that will be used by the restore_moochat_activity_task
+ * Version information for mod_moochat
  *
  * @package    mod_moochat
  * @copyright  2025 Brian A. Pool
@@ -17,7 +17,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_moochat';
-$plugin->version = 2025103009;  // YYYYMMDDXX - Converted to Templates and Output API
+$plugin->version = 2025103010;  // YYYYMMDDXX - Fixed backup/restore missing fields
 $plugin->requires = 2022041900; // Moodle 4.0
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = 'v1.2.2';
+$plugin->release = 'v1.2.3';

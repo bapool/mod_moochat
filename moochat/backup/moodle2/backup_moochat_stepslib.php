@@ -31,10 +31,10 @@ class backup_moochat_activity_structure_step extends backup_activity_structure_s
         // Define the root element describing the moochat instance.
         $moochat = new backup_nested_element('moochat', ['id'], [
             'name', 'intro', 'introformat', 'timecreated', 'timemodified',
-            'display', 'chatsize', 'systemprompt', 'avatarsize',
+            'display', 'chatsize', 'systemprompt', 'avatarurl', 'avatarsize',
             'include_section_content', 'include_hidden_content',
             'ratelimit_enable', 'ratelimit_period', 'ratelimit_count',
-            'maxmessages', 'temperature'
+            'maxmessages', 'temperature', 'model'
         ]);
 
         // Define usage data element (only if including userinfo).

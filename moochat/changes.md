@@ -259,6 +259,11 @@ $renderer = $PAGE->get_renderer('mod_moochat');
 echo $renderer->render_chat_interface($chatinterface);
 ```
 
-**Status:** ✓ COMPLETE
+## Version 1.2.3 (2025-11-10)
+
+### Bug Fixes
+- Fixed backup and restore functionality failing with status code 500
+- Added missing 'model' and 'avatarurl' fields to backup structure
+- Backup and restore now correctly preserves all moochat activity settings
 
 ---
